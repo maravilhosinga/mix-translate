@@ -1,0 +1,54 @@
+{
+  "feedback_screen.my_feedback": "My feedback",
+  "feedback_screen.questioning_": "Questioning",
+  "contact_customer_service_screen.customer_service":
+      "Contact customer service",
+  "contact_customer_service_screen.solved_": "Solved",
+  "contact_customer_service_screen.continue_questions": "Continue questions",
+  "contact_customer_service_screen.thanks_feedback":
+      "Thank you for your feedback, we will reply to you within 24 hours.",
+  "contact_customer_service_screen.tips_": "Tips",
+  "contact_customer_service_screen.confirmation_msg":
+      "Please reconfirm that your problem has been resolved.",
+  "category_question.consult_": "Consult",
+  "category_question.report_complaints": "Report complaints",
+  "category_question.feedbacks_": "Feedbacks",
+  "category_question.business_cooperation": "Business cooperation",
+  "consult_issue.host_tasks_rewards": "Host Tasks/Rank Rewards",
+  "consult_issue.failure_receiving_coins":
+      "Failure of Receiving Coins After Top Up",
+  "consult_issue.face_authentication": "Face Authentication",
+  "consult_issue.change_gender_country": "Change of Gender/Country",
+  "consult_issue.appeal_account_suspension": "Appeal of Account Suspension",
+  "consult_issue.invitation_reward": "Invitation Reward",
+  "consult_issue.others_": "Others",
+  "report_complaints_issue.complaint_": "Complaint/Report",
+  "report_complaints_issue.live_broadcast_violation":
+      "Live broadcast violation",
+  "feedbacks_issue.account_security": "Account and Security",
+  "feedbacks_issue.game_": "Game",
+  "feedbacks_issue.software_defect": "Software defect",
+  "feedbacks_issue.feature_requests": "Feature requests",
+  "feedbacks_issue.spot_error_coins": "Spot Error and Get Coins",
+  "business_cooperation_issue.agency_application": "Agency application",
+  "business_cooperation_issue.agency_host": "Agency & host",
+  "report_screen.contact_customer_service": "Contact customer service",
+  "report_screen.choose_cat_info":
+      "Choose the right category to triple your response speed",
+  "report_screen.select_category": "Please select the category of question",
+  "report_screen.select_issue": "Please select the issue details",
+  "report_screen.describe_issue": "Please describe your issue",
+  "report_screen.describe_issue_hint":
+      "Please describe your problem in detail so that we can help you ASAP",
+  "report_screen.annex_media_files":
+      "If you have photos/videos, please provide it to us so that we can assist better on your problems",
+  "report_screen.submit_": "Submit",
+  "report_screen.add_photos": "Add photos",
+  "report_screen.add_video": "Add video",
+  "report_screen.cat_question": "Category Question",
+  "report_screen.issue_detail": "Issue detail",
+  "report_screen.report_success_title": "Reported successfully",
+  "payroll_screen.place_order_ask_message":
+      "You are about to withdraw @amount points, around @money USD (Exc. Fees) by placing order to agents.",
+  "payroll_screen.host_fees_paid": "Fees paid"
+}

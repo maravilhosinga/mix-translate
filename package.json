@@ -1,0 +1,42 @@
+{
+  "name": "mix-translate-cli",
+  "version": "1.0.0",
+  "description": "A powerful translation CLI tool supporting multiple AI providers",
+  "main": "translate.js",
+  "bin": {
+    "mix-translate": "./bin/mix-translate.js",
+    "mix-translate-setup": "./bin/setup.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "translation",
+    "ai",
+    "cli",
+    "openai",
+    "google",
+    "claude",
+    "deepseek",
+    "gemini"
+  ],
+  "author": "Maravilho Singa Mongo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maravilhosinga/mix-translate.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
+    "@google-cloud/translate": "^8.0.2",
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "commander": "^11.1.0",
+    "deepseek-api": "^1.0.6",
+    "dotenv": "^16.4.1",
+    "openai": "^4.82.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
