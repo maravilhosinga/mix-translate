@@ -10,17 +10,23 @@ class ClaudeTranslator {
 
   async translate(text, targetLang) {
     try {
+      // Extract and replace variables before translation
+      const { text: preparedText, variables } = prepareForTranslation(text);
+
       const response = await this.client.messages.create({
         model: 'claude-3-opus-20240229',
         max_tokens: 1024,
         messages: [{
           role: 'user',
-          content: `Translate the following text to ${targetLang}. Respond with ONLY the translation, no explanations or additional text: "${text}"`
+          content: `Translate the following text to ${targetLang}. Keep the placeholders <0>, <1>, etc. exactly as they are. Respond with ONLY the translation: "${preparedText}"`
         }]
       });
 
       const translation = response.content[0].text.trim();
-      return translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
+      const cleanTranslation = translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
+      
+      // Restore variables in the translated text
+      return restoreVariables(cleanTranslation, variables);
     } catch (error) {
       console.error('Claude translation error:', error.message);
       return null;

@@ -9,13 +9,16 @@ class DeepSeekTranslator {
 
   async translate(text, targetLang) {
     try {
+      // Extract and replace variables before translation
+      const { text: preparedText, variables } = prepareForTranslation(text);
+
       const response = await axios.post(
         `${this.baseURL}/chat/completions`,
         {
           model: 'deepseek-chat',
           messages: [{
             role: 'user',
-            content: `Translate the following text to ${targetLang}. Respond with ONLY the translation, no explanations or additional text: "${text}"`
+            content: `Translate the following text to ${targetLang}. Keep the placeholders <0>, <1>, etc. exactly as they are. Respond with ONLY the translation: "${preparedText}"`
           }],
           temperature: 0.3,
           max_tokens: 1024
@@ -29,7 +32,10 @@ class DeepSeekTranslator {
       );
 
       const translation = response.data.choices[0].message.content.trim();
-      return translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
+      const cleanTranslation = translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
+      
+      // Restore variables in the translated text
+      return restoreVariables(cleanTranslation, variables);
     } catch (error) {
       console.error('DeepSeek translation error:', error.response?.data?.error || error.message);
       return null;
