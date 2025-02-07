@@ -48,8 +48,8 @@ function prepareForTranslation(text, useSpecialFormat = false) {
     const variable = variables[i];
     // For Google Translate, use a special format that's less likely to be modified
     const placeholder = useSpecialFormat ? 
-      `[[${i}]]` :  // Special format for Google Translate
-      `<${i}>`    // Normal format for other providers
+      `NOTRANSLATE_VAR_${i}_` :  // Special format for Google Translate with NOTRANSLATE prefix
+      `<${i}>`                    // Normal format for other providers
     preparedText = preparedText.slice(0, variable.start) + 
                    placeholder +
                    preparedText.slice(variable.end);
@@ -71,9 +71,11 @@ function restoreVariables(translatedText, variables, useSpecialFormat = false) {
   // Replace placeholders with original variables
   for (let i = 0; i < variables.length; i++) {
     const placeholder = useSpecialFormat ? 
-      `[[${i}]]` :  // Special format for Google Translate
-      `<${i}>`    // Normal format for other providers
-    restoredText = restoredText.replace(placeholder, variables[i].value);
+      `NOTRANSLATE_VAR_${i}_` :  // Special format for Google Translate with NOTRANSLATE prefix
+      `<${i}>`                    // Normal format for other providers
+    // Use a global regex to ensure all instances are replaced
+    const regex = new RegExp(placeholder, 'g');
+    restoredText = restoredText.replace(regex, variables[i].value);
   }
   
   return restoredText;

@@ -9,9 +9,38 @@ class GeminiTranslator {
 
   async translate(text, targetLang) {
     try {
-      const prompt = `Translate the following text to ${targetLang}. Keep all placeholders like @variable and {variable} exactly as they are. Respond with ONLY the translation: "${text}"`;
+      // Map language codes to full names for clearer instruction
+      const languageMap = {
+        'it': 'Italian',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'pt': 'Portuguese',
+        'ru': 'Russian',
+        'zh': 'Chinese',
+        'ja': 'Japanese',
+        'ko': 'Korean'
+      };
       
-      const result = await this.model.generateContent(prompt);
+      const targetLanguage = languageMap[targetLang.toLowerCase()] || targetLang;
+      const prompt = `You are a professional translator. Translate this text from English to ${targetLanguage}:
+"${text}"
+
+Rules:
+1. Translate ONLY to ${targetLanguage}, never mix languages
+2. Keep all @variables and {variables} exactly as they are
+3. Respond with ONLY the translation
+4. Do not add quotes, explanations, or comments`;
+      
+      const result = await this.model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.3,  // Lower temperature for more consistent translations
+          topK: 1,
+          topP: 0.8,
+        }
+      });
+      
       const response = await result.response;
       const translation = response.text().trim();
       

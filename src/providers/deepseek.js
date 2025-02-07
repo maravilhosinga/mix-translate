@@ -9,17 +9,42 @@ class DeepSeekTranslator {
 
   async translate(text, targetLang) {
     try {
-      // Extract and replace variables before translation
-      const { text: preparedText, variables } = prepareForTranslation(text);
-
+      // Map language codes to full names for clearer instruction
+      const languageMap = {
+        'it': 'Italian',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'pt': 'Portuguese',
+        'ru': 'Russian',
+        'zh': 'Chinese',
+        'ja': 'Japanese',
+        'ko': 'Korean'
+      };
+      
+      const targetLanguage = languageMap[targetLang.toLowerCase()] || targetLang;
+      
       const response = await axios.post(
         `${this.baseURL}/chat/completions`,
         {
           model: 'deepseek-chat',
-          messages: [{
-            role: 'user',
-            content: `Translate the following text to ${targetLang}. Keep the placeholders like @variable, {variable}, etc. exactly as they are. Respond with ONLY the translation, no comments, it's a website ou application string translation: "${preparedText}"`
-          }],
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a professional translator. Your task is to translate text accurately while maintaining exact placeholders. Never translate placeholders starting with @ or enclosed in {}. Never mix languages - use only the target language. Never add explanations.'
+            },
+            {
+              role: 'user',
+              content: `Translate this text from English to ${targetLanguage}. Keep all placeholders exactly as they are:
+"${text}"
+
+Rules:
+1. Translate ONLY to ${targetLanguage}, never mix languages
+2. Keep all @variables and {variables} exactly as they are
+3. Respond with ONLY the translation
+4. Do not add quotes, explanations, or comments`
+            }
+          ],
           temperature: 0.3,
           max_tokens: 1024
         },
@@ -32,10 +57,7 @@ class DeepSeekTranslator {
       );
 
       const translation = response.data.choices[0].message.content.trim();
-      const cleanTranslation = translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
-      
-      // Restore variables in the translated text
-      return restoreVariables(cleanTranslation, variables);
+      return translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
     } catch (error) {
       console.error('DeepSeek translation error:', error.response?.data?.error || error.message);
       return null;

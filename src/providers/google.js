@@ -29,14 +29,34 @@ class GoogleTranslator {
       // Extract and replace variables before translation using special format
       const { text: preparedText, variables } = prepareForTranslation(text, true);
       
-      // Perform the translation
-      const [translation] = await this.translator.translate(preparedText, {
-        to: googleLangCode,
-        format: 'text'  // Use text format to minimize formatting changes
-      });
+      // First, detect the source language to ensure consistent translation
+      const [detections] = await this.translator.detect(preparedText);
+      const sourceLanguage = Array.isArray(detections) ? detections[0].language : detections.language;
+      
+      // Split text into segments around variables to prevent them from being translated
+      const segments = preparedText.split(/NOTRANSLATE_VAR_\d+_/);
+      const translatedSegments = await Promise.all(
+        segments.map(segment => 
+          segment.trim() ? 
+            this.translator.translate(segment, {
+              from: sourceLanguage,
+              to: googleLangCode,
+              format: 'text'
+            }).then(([t]) => t) : 
+            Promise.resolve(segment)
+        )
+      );
+      
+      // Reconstruct the text with variables
+      let reconstructed = preparedText;
+      for (let i = 0; i < segments.length; i++) {
+        if (segments[i].trim()) {
+          reconstructed = reconstructed.replace(segments[i], translatedSegments[i]);
+        }
+      }
       
       // Restore variables in the translated text using special format
-      return restoreVariables(translation, variables, true);
+      return restoreVariables(reconstructed, variables, true);
     } catch (error) {
       console.error('Google translation error:', error.message);
       return null;
