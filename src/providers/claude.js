@@ -1,6 +1,5 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const config = require('../../config/default');
-const { prepareForTranslation, restoreVariables } = require('../utils/translation-helper');
 
 class ClaudeTranslator {
   constructor() {
@@ -19,7 +18,7 @@ class ClaudeTranslator {
         max_tokens: 1024,
         messages: [{
           role: 'user',
-          content: `Translate the following text to ${targetLang}. Keep the placeholders <0>, <1>, etc. exactly as they are. Respond with ONLY the translation: "${preparedText}"`
+          content: `Translate the following text to ${targetLang}. Keep the placeholders like @variable, {variable}, etc. exactly as they are. Respond with ONLY the translation, no comments, it's a website ou application string translation: "${preparedText}"`
         }]
       });
 

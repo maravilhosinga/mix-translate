@@ -26,16 +26,17 @@ class GoogleTranslator {
 
       const googleLangCode = languageMap[targetLang.toLowerCase()] || targetLang;
       
-      // Extract and replace variables before translation
-      const { text: preparedText, variables } = prepareForTranslation(text);
+      // Extract and replace variables before translation using special format
+      const { text: preparedText, variables } = prepareForTranslation(text, true);
       
       // Perform the translation
       const [translation] = await this.translator.translate(preparedText, {
-        to: googleLangCode
+        to: googleLangCode,
+        format: 'text'  // Use text format to minimize formatting changes
       });
       
-      // Restore variables in the translated text
-      return restoreVariables(translation, variables);
+      // Restore variables in the translated text using special format
+      return restoreVariables(translation, variables, true);
     } catch (error) {
       console.error('Google translation error:', error.message);
       return null;

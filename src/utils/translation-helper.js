@@ -35,9 +35,10 @@ function extractVariables(text) {
 /**
  * Prepares text for translation by replacing variables with placeholders
  * @param {string} text Input text
+ * @param {boolean} useSpecialFormat Whether to use special format for Google Translate
  * @returns {{text: string, variables: Array}} Prepared text and variables
  */
-function prepareForTranslation(text) {
+function prepareForTranslation(text, useSpecialFormat = false) {
   const variables = extractVariables(text);
   let preparedText = text;
   
@@ -45,9 +46,12 @@ function prepareForTranslation(text) {
   // to avoid affecting the positions of subsequent variables
   for (let i = variables.length - 1; i >= 0; i--) {
     const variable = variables[i];
-    // Use <N> as placeholder to avoid confusion with {variable} format
+    // For Google Translate, use a special format that's less likely to be modified
+    const placeholder = useSpecialFormat ? 
+      `[[${i}]]` :  // Special format for Google Translate
+      `<${i}>`    // Normal format for other providers
     preparedText = preparedText.slice(0, variable.start) + 
-                   `<${i}>` +
+                   placeholder +
                    preparedText.slice(variable.end);
   }
   
@@ -58,14 +62,18 @@ function prepareForTranslation(text) {
  * Restores variables in the translated text
  * @param {string} translatedText Translated text with placeholders
  * @param {Array} variables Original variables
+ * @param {boolean} useSpecialFormat Whether to use special format for Google Translate
  * @returns {string} Text with restored variables
  */
-function restoreVariables(translatedText, variables) {
+function restoreVariables(translatedText, variables, useSpecialFormat = false) {
   let restoredText = translatedText;
   
   // Replace placeholders with original variables
   for (let i = 0; i < variables.length; i++) {
-    restoredText = restoredText.replace(`<${i}>`, variables[i].value);
+    const placeholder = useSpecialFormat ? 
+      `[[${i}]]` :  // Special format for Google Translate
+      `<${i}>`    // Normal format for other providers
+    restoredText = restoredText.replace(placeholder, variables[i].value);
   }
   
   return restoredText;
