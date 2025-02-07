@@ -1,10 +1,31 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const config = require('../../config/default');
+const { cleanTranslation } = require('../utils/translation-cleaner');
 
 class GeminiTranslator {
   constructor() {
     this.genAI = new GoogleGenerativeAI(config.gemini.apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
+    this.model = this.genAI.getGenerativeModel({
+      model: 'gemini-pro',
+      safetySettings: [
+        {
+          category: 'HARM_CATEGORY_HARASSMENT',
+          threshold: 'BLOCK_ONLY_HIGH'
+        },
+        {
+          category: 'HARM_CATEGORY_HATE_SPEECH',
+          threshold: 'BLOCK_ONLY_HIGH'
+        },
+        {
+          category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+          threshold: 'BLOCK_ONLY_HIGH'
+        },
+        {
+          category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+          threshold: 'BLOCK_ONLY_HIGH'
+        }
+      ]
+    });
   }
 
   async translate(text, targetLang) {
@@ -23,7 +44,8 @@ class GeminiTranslator {
       };
       
       const targetLanguage = languageMap[targetLang.toLowerCase()] || targetLang;
-      const prompt = `You are a professional translator. Translate this text from English to ${targetLanguage}:
+      const prompt = `You are a professional translator working on a software localization task. Translate this text from English to ${targetLanguage}. This is a UI string that may contain technical terms and placeholders:
+      
 "${text}"
 
 Rules:
@@ -42,9 +64,8 @@ Rules:
       });
       
       const response = await result.response;
-      const translation = response.text().trim();
-      
-      return translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
+      const rawTranslation = response.text().trim();
+return cleanTranslation(rawTranslation, text);
     } catch (error) {
       console.error('Gemini translation error:', error.message);
       return null;

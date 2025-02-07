@@ -29,34 +29,53 @@ class GoogleTranslator {
       // Extract and replace variables before translation using special format
       const { text: preparedText, variables } = prepareForTranslation(text, true);
       
-      // First, detect the source language to ensure consistent translation
-      const [detections] = await this.translator.detect(preparedText);
-      const sourceLanguage = Array.isArray(detections) ? detections[0].language : detections.language;
+      // Split text into translatable segments and variables
+      const segments = [];
+      const extractedVariables = [];
+      let currentText = '';
+      let lastIndex = 0;
       
-      // Split text into segments around variables to prevent them from being translated
-      const segments = preparedText.split(/NOTRANSLATE_VAR_\d+_/);
+      // Match @variable pattern
+      const regex = /@[a-zA-Z_][a-zA-Z0-9_]*/g;
+      let match;
+      
+      while ((match = regex.exec(text)) !== null) {
+        // Add text before the variable
+        if (match.index > lastIndex) {
+          currentText = text.slice(lastIndex, match.index).trim();
+          if (currentText) segments.push(currentText);
+        }
+        
+        // Store the variable
+        extractedVariables.push(match[0]);
+        lastIndex = match.index + match[0].length;
+      }
+      
+      // Add remaining text after last variable
+      if (lastIndex < text.length) {
+        currentText = text.slice(lastIndex).trim();
+        if (currentText) segments.push(currentText);
+      }
+      
+      // Translate all segments
       const translatedSegments = await Promise.all(
-        segments.map(segment => 
-          segment.trim() ? 
-            this.translator.translate(segment, {
-              from: sourceLanguage,
-              to: googleLangCode,
-              format: 'text'
-            }).then(([t]) => t) : 
-            Promise.resolve(segment)
+        segments.map(segment =>
+          this.translator.translate(segment, {
+            to: googleLangCode,
+            format: 'text'
+          }).then(([translation]) => translation)
         )
       );
       
       // Reconstruct the text with variables
-      let reconstructed = preparedText;
+      let result = text;
       for (let i = 0; i < segments.length; i++) {
         if (segments[i].trim()) {
-          reconstructed = reconstructed.replace(segments[i], translatedSegments[i]);
+          result = result.replace(segments[i], translatedSegments[i]);
         }
       }
       
-      // Restore variables in the translated text using special format
-      return restoreVariables(reconstructed, variables, true);
+      return result;
     } catch (error) {
       console.error('Google translation error:', error.message);
       return null;

@@ -1,5 +1,6 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const config = require('../../config/default');
+const { cleanTranslation } = require('../utils/translation-cleaner');
 
 class ClaudeTranslator {
   constructor() {
@@ -28,7 +29,7 @@ class ClaudeTranslator {
       const response = await this.client.messages.create({
         model: 'claude-3-opus-20240229',
         max_tokens: 1024,
-        system: 'You are a professional translator. Your task is to translate text accurately while maintaining exact placeholders. Never translate placeholders starting with @ or enclosed in {}. Never mix languages - use only the target language. Never add explanations.',
+        system: 'You are a professional translator. Translate text accurately while preserving exact placeholders. Never translate or modify placeholders starting with @ or enclosed in {}. Use only the target language, maintaining natural and idiomatic expressions. Never include translation instructions or metadata in the output.',
         messages: [{
           role: 'user',
           content: `Translate this text from English to ${targetLanguage}. Keep all placeholders exactly as they are:
@@ -42,8 +43,8 @@ Rules:
         }]
       });
 
-      const translation = response.content[0].text.trim();
-      return translation.replace(/^["'](.*)["']$/, '$1'); // Remove quotes if present
+      const rawTranslation = response.content[0].text.trim();
+return cleanTranslation(rawTranslation, text);
     } catch (error) {
       console.error('Claude translation error:', error.message);
       return null;
