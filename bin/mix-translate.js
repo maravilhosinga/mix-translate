@@ -4,11 +4,12 @@ const path = require('path');
 const fs = require('fs');
 const { program } = require('commander');
 const Translator = require('../src/utils/translator');
+const { version } = require('../package.json');
 
 program
   .name('mix-translate')
   .description('AI-powered translation CLI supporting multiple providers')
-  .version('1.0.0');
+  .version(version);
 
 program
   .argument('<input-file>', 'Input JSON file to translate')
