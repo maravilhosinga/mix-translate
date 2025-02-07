@@ -1,5 +1,6 @@
 const { Translate } = require('@google-cloud/translate').v2;
 const config = require('../../config/default');
+const { prepareForTranslation, restoreVariables } = require('../utils/translation-helper');
 
 class GoogleTranslator {
   constructor() {
@@ -25,12 +26,16 @@ class GoogleTranslator {
 
       const googleLangCode = languageMap[targetLang.toLowerCase()] || targetLang;
       
+      // Extract and replace variables before translation
+      const { text: preparedText, variables } = prepareForTranslation(text);
+      
       // Perform the translation
-      const [translation] = await this.translator.translate(text, {
+      const [translation] = await this.translator.translate(preparedText, {
         to: googleLangCode
       });
-
-      return translation;
+      
+      // Restore variables in the translated text
+      return restoreVariables(translation, variables);
     } catch (error) {
       console.error('Google translation error:', error.message);
       return null;

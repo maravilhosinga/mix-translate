@@ -1,5 +1,6 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const config = require('../../config/default');
+const { prepareForTranslation, restoreVariables } = require('../utils/translation-helper');
 
 class ClaudeTranslator {
   constructor() {

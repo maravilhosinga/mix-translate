@@ -1,5 +1,6 @@
 const config = require('../../config/default');
 const axios = require('axios');
+const { prepareForTranslation, restoreVariables } = require('../utils/translation-helper');
 
 class DeepSeekTranslator {
   constructor() {
